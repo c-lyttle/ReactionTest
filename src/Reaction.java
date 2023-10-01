@@ -1,10 +1,10 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import java.time.Clock;
 
 import javax.swing.BorderFactory;
@@ -14,8 +14,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
-
-
 
 public class Reaction implements ActionListener {
 	
@@ -59,39 +57,48 @@ public class Reaction implements ActionListener {
 		frame.add(panel, BorderLayout.CENTER);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setTitle("Reaction Time Tester");
-		frame.setSize(new Dimension(400,300));
 		frame.pack();
 		frame.setVisible(true);
 	}
 
 	public static void main(String[] args) {
+		//Creates new game object
 		new Reaction();
-
 	}
 
+	//Called on button click
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		
+		//If the light is not yet red
 		if (readyState == false) {
 			reactionTimeLabel.setText("Too Early!");
 			reactionLight.setForeground(Color.green);
 			button.setText("Click me when ready");
 			clickState = false;
+			//Exits method early (used as a break)
 			return;
 		}
+		
+		//Switch the clickState
 		clickState = !clickState;
+		
+		//Click to start game
 		if (clickState==true) {
 			readyState = false;
 			button.setText("Don't Click");
+			
+			//Generates random time (1000-2500ms)
 			int randomInt = (int)Math.floor(Math.random() * 15);
-			if (randomInt == 0) {
-				randomInt = 5;
-			}
-			randomInt = randomInt*100;
+			randomInt = (randomInt+10)*100;
+			
+			//Timer is initialised and starts counting the random time
 			Timer timer = new Timer(randomInt, this::timerMethod);
 			timer.setRepeats(false);
-			System.out.println(randomInt);
 			timer.start();
 		}
+		
+		//Click to end game
 		else {
 			endTime = clock.millis();
 			outTime = endTime-startTime;
@@ -101,6 +108,7 @@ public class Reaction implements ActionListener {
 		}
 	}
 	
+	//Called after 'timer' has counted for the random amount of time
 	private void timerMethod(ActionEvent e){
 		if (clickState == true) {
 			startTime = clock.millis();
