@@ -12,16 +12,21 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
+import javax.swing.border.EmptyBorder;
 
 public class Reaction implements ActionListener {
 	
 	private JLabel welcomeLabel;
 	private JLabel reactionLight;
 	private JLabel reactionTimeLabel;
+	private JLabel leaderboardTitle;
 	private JFrame frame;
-	private JPanel panel;
+	private JPanel pane1;
+	private JPanel pane2;
+	private JTabbedPane tabbedPane;
 	private JButton button;
 	private Boolean clickState = false;
 	private Boolean readyState = true;
@@ -29,35 +34,53 @@ public class Reaction implements ActionListener {
 	private long startTime = 0;
 	private long endTime = 0;
 	private long outTime = 0;
+	DBManager dbManager = new DBManager();
+	private int count = 1;
 	
 	public Reaction() {
 		
-		DBManager dbManager = new DBManager();
-		dbManager.out();
-		
 		frame = new JFrame();
+		
+		tabbedPane = new JTabbedPane();
 		
 		button = new JButton("Click me when ready");
 		button.addActionListener(this);
 		
-		welcomeLabel = new JLabel("Welcome to Reaction Time Tester");
+		welcomeLabel = new JLabel("Welcome to Reaction Time Tester", SwingConstants.CENTER);
 		
 		reactionLight = new JLabel("•", SwingConstants.CENTER);
 		reactionLight.setForeground(Color.green);
 		reactionLight.setFont(new Font("Calibri", Font.BOLD, 50));
 		
 		reactionTimeLabel = new JLabel(" ", SwingConstants.CENTER);
+		leaderboardTitle = new JLabel("Leaderboard:", SwingConstants.CENTER);
 		
-		panel = new JPanel();
-		panel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
-		panel.setLayout(new GridLayout(0,1));
-		panel.add(welcomeLabel);
-		panel.add(reactionLight);
-		panel.add(button);
-		panel.add(reactionTimeLabel);
+		pane1 = new JPanel();
+		pane1.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+		pane1.setLayout(new GridLayout(0,1));
+		pane1.add(welcomeLabel);
+		pane1.add(reactionLight);
+		pane1.add(button);
+		pane1.add(reactionTimeLabel);
+		
+		pane2 = new JPanel();
+		pane2.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+		pane2.setLayout(new GridLayout(0,1));
+		pane2.add(leaderboardTitle);
+		
+		for (String i:dbManager.getLeaderboard()) {
+			JLabel lItem = new JLabel(count + ": " + i,SwingConstants.LEFT);
+			lItem.setFont(new Font("Calibri", Font.PLAIN, 15));
+			pane2.add(lItem);
+			count++;
+		}
 		
 		
-		frame.add(panel, BorderLayout.CENTER);
+		tabbedPane.add("Game", pane1);
+		tabbedPane.add("Leaderboard", pane2);
+		
+		frame.add(tabbedPane);
+		//frame.add(pane1, BorderLayout.CENTER);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setTitle("Reaction Time Tester");
 		frame.pack();
