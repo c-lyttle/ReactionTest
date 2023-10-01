@@ -37,5 +37,19 @@ public class DBManager {
 		}
 	}
 	
+	public void appendItem(String u, long t) {
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			Connection connection = DriverManager.getConnection(url, username, password);
+			Statement statement = connection.createStatement();
+			System.out.println("INSERT INTO leaderboard (id, user, time) VALUES (4, '"+u+"','"+ t + "'");
+			statement.executeUpdate("INSERT INTO leaderboard (id, user, time) VALUES (NULL, '"+u+"','"+ t + "')");
+			connection.close();		
+		}
+		catch (Exception e) {
+			System.out.println(e);
+		}
+	}
+	
 
 }

@@ -13,6 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
@@ -28,6 +29,8 @@ public class Reaction implements ActionListener {
 	private JPanel pane2;
 	private JTabbedPane tabbedPane;
 	private JButton button;
+	private JButton submitButton;
+	private JTextField usernameInput;
 	private Boolean clickState = false;
 	private Boolean readyState = true;
 	private Clock clock = Clock.systemDefaultZone();
@@ -50,10 +53,9 @@ public class Reaction implements ActionListener {
 		
 		reactionLight = new JLabel("•", SwingConstants.CENTER);
 		reactionLight.setForeground(Color.green);
-		reactionLight.setFont(new Font("Calibri", Font.BOLD, 50));
+		reactionLight.setFont(new Font("Calibri", Font.BOLD, 100));
 		
 		reactionTimeLabel = new JLabel(" ", SwingConstants.CENTER);
-		leaderboardTitle = new JLabel("Leaderboard:", SwingConstants.CENTER);
 		
 		pane1 = new JPanel();
 		pane1.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
@@ -62,6 +64,11 @@ public class Reaction implements ActionListener {
 		pane1.add(reactionLight);
 		pane1.add(button);
 		pane1.add(reactionTimeLabel);
+		
+		leaderboardTitle = new JLabel("Leaderboard:", SwingConstants.CENTER);
+		usernameInput = new JTextField("Enter your username here");
+		submitButton = new JButton("Submit");
+		submitButton.addActionListener(this::submitUsername);
 		
 		pane2 = new JPanel();
 		pane2.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
@@ -75,12 +82,13 @@ public class Reaction implements ActionListener {
 			count++;
 		}
 		
+		pane2.add(usernameInput);
+		pane2.add(submitButton);
 		
 		tabbedPane.add("Game", pane1);
 		tabbedPane.add("Leaderboard", pane2);
 		
 		frame.add(tabbedPane);
-		//frame.add(pane1, BorderLayout.CENTER);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setTitle("Reaction Time Tester");
 		frame.pack();
@@ -145,6 +153,12 @@ public class Reaction implements ActionListener {
 		else {
 			readyState=true;
 		}
+	}
+	
+	private void submitUsername(ActionEvent e) {
+		String user = this.usernameInput.getText();
+		long time = this.outTime;
+		this.dbManager.appendItem(user, time);
 	}
 
 }
