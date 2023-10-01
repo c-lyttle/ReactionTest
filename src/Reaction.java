@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.Clock;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -20,10 +21,16 @@ public class Reaction implements ActionListener {
 	
 	private JLabel welcomeLabel;
 	private JLabel reactionLight;
+	private JLabel reactionTimeLabel;
 	private JFrame frame;
 	private JPanel panel;
 	private JButton button;
 	private Boolean clickState = false;
+	private Boolean readyState = true;
+	private Clock clock = Clock.systemDefaultZone();
+	private long startTime = 0;
+	private long endTime = 0;
+	private long outTime = 0;
 	
 	public Reaction() {
 		
@@ -38,12 +45,15 @@ public class Reaction implements ActionListener {
 		reactionLight.setForeground(Color.green);
 		reactionLight.setFont(new Font("Calibri", Font.BOLD, 50));
 		
+		reactionTimeLabel = new JLabel(" ", SwingConstants.CENTER);
+		
 		panel = new JPanel();
 		panel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 		panel.setLayout(new GridLayout(0,1));
 		panel.add(welcomeLabel);
 		panel.add(reactionLight);
 		panel.add(button);
+		panel.add(reactionTimeLabel);
 		
 		
 		frame.add(panel, BorderLayout.CENTER);
@@ -61,23 +71,46 @@ public class Reaction implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		reactionLight.setForeground(Color.green);
-		button.setText("Don't Click");
-		int randomInt = (int)Math.floor(Math.random() * 15);
-		if (randomInt == 0) {
-			randomInt = 5;
+		if (readyState == false) {
+			reactionTimeLabel.setText("Too Early!");
+			reactionLight.setForeground(Color.green);
+			button.setText("Click me when ready");
+			clickState = false;
+			return;
 		}
-		randomInt = randomInt*100;
-		Timer timer = new Timer(randomInt, this::timerMethod);
-		timer.setRepeats(false);
-		System.out.println(randomInt);
-		//wait(randomInt);
-		timer.start();
+		clickState = !clickState;
+		if (clickState==true) {
+			readyState = false;
+			button.setText("Don't Click");
+			int randomInt = (int)Math.floor(Math.random() * 15);
+			if (randomInt == 0) {
+				randomInt = 5;
+			}
+			randomInt = randomInt*100;
+			Timer timer = new Timer(randomInt, this::timerMethod);
+			timer.setRepeats(false);
+			System.out.println(randomInt);
+			timer.start();
+		}
+		else {
+			endTime = clock.millis();
+			outTime = endTime-startTime;
+			reactionLight.setForeground(Color.green);
+			button.setText("Click me when ready");
+			reactionTimeLabel.setText("Your reaction time is "+ outTime +"ms");
+		}
 	}
 	
 	private void timerMethod(ActionEvent e){
-		reactionLight.setForeground(Color.red);
-		button.setText("Click!");
+		if (clickState == true) {
+			startTime = clock.millis();
+			readyState = true;
+			reactionLight.setForeground(Color.red);
+			button.setText("Click!");
+		}
+		else {
+			readyState=true;
+		}
 	}
 
 }
