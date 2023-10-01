@@ -32,6 +32,9 @@ public class Reaction implements ActionListener {
 	
 	public Reaction() {
 		
+		DBManager dbManager = new DBManager();
+		dbManager.out();
+		
 		frame = new JFrame();
 		
 		button = new JButton("Click me when ready");
