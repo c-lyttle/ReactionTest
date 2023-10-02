@@ -1,12 +1,12 @@
-import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.time.Clock;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -16,7 +16,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
-import javax.swing.border.EmptyBorder;
 
 public class Reaction implements ActionListener {
 	
@@ -36,15 +35,22 @@ public class Reaction implements ActionListener {
 	private Clock clock = Clock.systemDefaultZone();
 	private long startTime = 0;
 	private long endTime = 0;
-	private long outTime = 0;
-	DBManager dbManager = new DBManager();
+	private long outTime = 1000;
 	private int count = 1;
+	DBManager dbManager = new DBManager();
+	
+	public static void main(String[] args) {
+		//Creates new game instance
+		new Reaction();
+	}
 	
 	public Reaction() {
 		
 		frame = new JFrame();
 		
 		tabbedPane = new JTabbedPane();
+		
+		//First Tab (Game)
 		
 		button = new JButton("Click me when ready");
 		button.addActionListener(this);
@@ -65,8 +71,16 @@ public class Reaction implements ActionListener {
 		pane1.add(button);
 		pane1.add(reactionTimeLabel);
 		
+		//Second Tab (Leaderboard)
+		
 		leaderboardTitle = new JLabel("Leaderboard:", SwingConstants.CENTER);
 		usernameInput = new JTextField("Enter your username here");
+		usernameInput.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				usernameInput.setText("");
+			}
+		});
 		submitButton = new JButton("Submit");
 		submitButton.addActionListener(this::submitUsername);
 		
@@ -80,24 +94,26 @@ public class Reaction implements ActionListener {
 			lItem.setFont(new Font("Calibri", Font.PLAIN, 15));
 			pane2.add(lItem);
 			count++;
+			if (count > 10) {
+				break;
+			}
 		}
 		
 		pane2.add(usernameInput);
 		pane2.add(submitButton);
 		
+		//Adds panes to tabbedPane
+		
 		tabbedPane.add("Game", pane1);
 		tabbedPane.add("Leaderboard", pane2);
+		
+		//Sets up frame
 		
 		frame.add(tabbedPane);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setTitle("Reaction Time Tester");
-		frame.pack();
+		frame.setSize(new Dimension(250,400));
 		frame.setVisible(true);
-	}
-
-	public static void main(String[] args) {
-		//Creates new game object
-		new Reaction();
 	}
 
 	//Called on button click
@@ -155,8 +171,10 @@ public class Reaction implements ActionListener {
 		}
 	}
 	
+	//Submits username, calls dbManager.appendItem to send SQL query
 	private void submitUsername(ActionEvent e) {
 		String user = this.usernameInput.getText();
+		this.usernameInput.setText("");
 		long time = this.outTime;
 		this.dbManager.appendItem(user, time);
 	}
